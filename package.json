@@ -61,8 +61,21 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "prepare": "simple-git-hooks",
     "prepublishOnly": "bun run lint && bun run typecheck && bun run test && bun run build",
     "clean": "rm -rf dist coverage"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "author": "Carl",
   "license": "MIT",
@@ -75,7 +88,9 @@
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^16.5.0",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
+    "simple-git-hooks": "^2.13.1",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.48.1"
   },
