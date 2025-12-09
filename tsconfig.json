@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    // Target & Module
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext"],
+    // Output
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    // Strict Type Safety (TS 6/7 Ready)
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    // Interop
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    // Bun Types
+    "types": ["bun-types"]
+  },
+  "include": ["src/**/*", "test/**/*", "build.ts"],
+  "exclude": ["node_modules", "dist"]
+}

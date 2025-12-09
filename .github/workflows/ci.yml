@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  quality:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Format Check
+        run: bun run format:check
+
+      - name: Type Check
+        run: bun run typecheck
+
+      - name: Test with Coverage
+        run: bun test --coverage
+
+      - name: Check Coverage Threshold
+        run: |
+          # Run tests with coverage and capture output
+          bun test --coverage 2>&1 | tee coverage-output.txt
+
+          # Extract coverage percentage and check threshold
+          COVERAGE=$(grep -E "All files" coverage-output.txt | awk -F'|' '{gsub(/[^0-9.]/, "", $2); print $2}' || echo "0")
+          THRESHOLD=95
+
+          echo "📊 Line Coverage: ${COVERAGE}%"
+          echo "📏 Threshold: ${THRESHOLD}%"
+
+          if [ -z "$COVERAGE" ] || [ "$COVERAGE" = "0" ]; then
+            echo "⚠️ Could not parse coverage. Check if tests exist."
+            # Don't fail if no coverage can be parsed (new project might have no tests yet)
+            exit 0
+          fi
+
+          # Compare using bc for floating point comparison
+          if [ $(echo "$COVERAGE < $THRESHOLD" | bc -l) -eq 1 ]; then
+            echo "❌ Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
+            exit 1
+          fi
+
+          echo "✅ Coverage threshold met!"
+
+      - name: Build
+        run: bun run build
+
+      - name: Verify build artifacts
+        run: |
+          echo "=== ESM ==="
+          ls -la dist/index.mjs
+          test -f dist/index.mjs
+          echo "=== CJS ==="
+          ls -la dist/index.cjs
+          test -f dist/index.cjs
+          echo "=== Types ==="
+          ls -la dist/types/
+          test -f dist/types/index.d.ts
