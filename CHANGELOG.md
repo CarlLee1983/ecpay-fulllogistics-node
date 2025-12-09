@@ -4,8 +4,13 @@
 
 ### Features
 
-- initial SDK implementation with core modules ([0e450a6](https://github.com/CarlLee1983/ecpay-fulllogistics-node/commit/0e450a6003f3f01e52125d85b4b2afbb42e27d2f))
-
+- **Core Operations**: `CreateLogisticsOrder`, `QueryLogisticsOrder`, `PrintTradeDocument`, `LogisticsNotify`
+- **Mutations**: `UpdateTempTrade`, `CancelC2COrder`, `UpdateB2COrder`, `UpdateC2COrder`
+- **Return Logistics**: `ReturnHome`, `ReturnCVS`
+- **Cryptography**: AES-128-CBC encryption/decryption compatible with ECPay
+- **Type Safety**: Full TypeScript support with comprehensive Enums (`LogisticsType`, `LogisticsSubType`, `Temperature`, `Distance`, etc.)
+- **Dual Support**: ESM and CJS builds
+- **Testing**: Over 95% test coverage
 ## Changelog
 
 All notable changes to this project will be documented in this file.

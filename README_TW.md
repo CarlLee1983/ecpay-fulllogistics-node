@@ -379,6 +379,7 @@ SDK 支援完整的物流操作：
 - `UpdateTempTrade`: 更新暫存物流訂單 (出貨前)
 - `CancelC2COrder`: 取消 C2C 訂單
 - `UpdateB2COrder`: 更新 B2C 出貨資訊
+- `UpdateC2COrder`: 更新 C2C 出貨資訊
 - `ReturnHome`: 建立宅配逆物流 (退貨)
 - `ReturnCVS`: 建立超商逆物流 (退貨)
 

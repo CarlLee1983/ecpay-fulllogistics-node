@@ -379,6 +379,7 @@ The SDK supports various other operations:
 - `UpdateTempTrade`: Update temporary order (before shipping)
 - `CancelC2COrder`: Cancel C2C order
 - `UpdateB2COrder`: Update B2C shipment info
+- `UpdateC2COrder`: Update C2C shipment info
 - `ReturnHome`: Create Home Return order
 - `ReturnCVS`: Create CVS Return order
 
