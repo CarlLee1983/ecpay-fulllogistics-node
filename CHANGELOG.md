@@ -11,6 +11,7 @@
 - **Type Safety**: Full TypeScript support with comprehensive Enums (`LogisticsType`, `LogisticsSubType`, `Temperature`, `Distance`, etc.)
 - **Dual Support**: ESM and CJS builds
 - **Testing**: Over 95% test coverage
+
 ## Changelog
 
 All notable changes to this project will be documented in this file.
