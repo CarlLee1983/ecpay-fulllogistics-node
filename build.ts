@@ -65,6 +65,13 @@ async function build() {
     process.exit(1)
   }
 
+  // Flatten types if nested under src because of package.json import
+  if ((await $`test -d dist/types/src`.nothrow()).exitCode === 0) {
+    console.log('🔧 Flattening type definitions...')
+    await $`cp -r dist/types/src/* dist/types/`
+    await $`rm -rf dist/types/src`
+  }
+
   console.log('✅ Build complete!')
   console.log('   - dist/index.mjs (ESM)')
   console.log('   - dist/index.cjs (CJS)')
