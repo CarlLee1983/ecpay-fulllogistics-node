@@ -7,11 +7,12 @@ import {
   getApiUrl,
   type EcPayConfig,
 } from '../src/index'
+import packageJson from '../package.json'
 
 describe('ECPay Full Logistics SDK', () => {
   describe('VERSION', () => {
     it('should export the current version', () => {
-      expect(VERSION).toBe('1.0.0')
+      expect(VERSION).toBe(packageJson.version)
     })
   })
 
