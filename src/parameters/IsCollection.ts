@@ -1,5 +1,4 @@
-
 export enum IsCollection {
-    YES = 'Y',
-    NO = 'N',
+  YES = 'Y',
+  NO = 'N',
 }

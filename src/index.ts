@@ -1,4 +1,5 @@
 import { ApiMode } from './parameters/ApiMode.js'
+export { ApiMode }
 
 // Core
 export * from './core/CipherService.js'

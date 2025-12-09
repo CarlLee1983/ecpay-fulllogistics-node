@@ -1,4 +1,4 @@
 export enum ApiMode {
-    Production = 'Production',
-    Stage = 'Stage',
+  Production = 'Production',
+  Stage = 'Stage',
 }

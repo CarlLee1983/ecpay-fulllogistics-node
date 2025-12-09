@@ -1,4 +1,3 @@
-
 import { CipherService } from '../core/CipherService.js'
 
 export class LogisticsNotify {
@@ -20,18 +19,20 @@ export class LogisticsNotify {
 
         if (postData['Data'] && typeof postData['Data'] === 'string') {
             const cipher = new CipherService(this.hashKey, this.hashIv)
-            const decrypted = cipher.decrypt(postData['Data'])
             try {
-                this.decryptedData = JSON.parse(decodeURIComponent(decrypted))
-            } catch (e) {
-                // Try parsing without decodeURIComponent if basic parsing fails, 
-                // though typically decodeURIComponent is needed for URL-encoded strings if they come that way.
-                // CipherService.decrypt usually returns the raw string.
+                const decrypted = cipher.decrypt(postData['Data'])
                 try {
-                    this.decryptedData = JSON.parse(decrypted)
-                } catch (e2) {
-                    this.decryptedData = {}
+                    this.decryptedData = JSON.parse(decodeURIComponent(decrypted))
+                } catch (e) {
+                    try {
+                        this.decryptedData = JSON.parse(decrypted)
+                    } catch (e2) {
+                        this.decryptedData = {}
+                    }
                 }
+            } catch (e) {
+                // Decryption failed
+                this.decryptedData = {}
             }
         }
         return this

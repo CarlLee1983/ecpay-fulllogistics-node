@@ -11,7 +11,7 @@ import {
 describe('ECPay Full Logistics SDK', () => {
   describe('VERSION', () => {
     it('should export the current version', () => {
-      expect(VERSION).toBe('0.0.1')
+      expect(VERSION).toBe('1.0.0')
     })
   })
 
@@ -22,8 +22,8 @@ describe('ECPay Full Logistics SDK', () => {
     })
 
     it('should have Staging mode', () => {
-      const mode: ApiMode = ApiMode.Staging
-      expect(mode).toBe(ApiMode.Staging)
+      const mode: ApiMode = ApiMode.Stage
+      expect(mode).toBe(ApiMode.Stage)
     })
   })
 
@@ -33,7 +33,7 @@ describe('ECPay Full Logistics SDK', () => {
     })
 
     it('should have correct staging URL', () => {
-      expect(API_URLS[ApiMode.Staging]).toBe('https://logistics-stage.ecpay.com.tw')
+      expect(API_URLS[ApiMode.Stage]).toBe('https://logistics-stage.ecpay.com.tw')
     })
   })
 
@@ -42,7 +42,7 @@ describe('ECPay Full Logistics SDK', () => {
       merchantId: '2000132',
       hashKey: '5294y06JbISpM5x9',
       hashIv: 'v77hoKGq4kWxNNIS',
-      mode: ApiMode.Staging,
+      mode: ApiMode.Stage,
     }
 
     it('should return true for valid config', () => {
@@ -89,7 +89,7 @@ describe('ECPay Full Logistics SDK', () => {
     })
 
     it('should return staging URL when specified', () => {
-      expect(getApiUrl(ApiMode.Staging)).toBe('https://logistics-stage.ecpay.com.tw')
+      expect(getApiUrl(ApiMode.Stage)).toBe('https://logistics-stage.ecpay.com.tw')
     })
 
     it('should return production URL when specified', () => {

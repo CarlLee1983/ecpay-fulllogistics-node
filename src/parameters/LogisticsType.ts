@@ -2,13 +2,13 @@
  * 物流類型
  */
 export enum LogisticsType {
-    /**
-     * 超商取貨
-     */
-    CVS = 'CVS',
+  /**
+   * 超商取貨
+   */
+  CVS = 'CVS',
 
-    /**
-     * 宅配
-     */
-    HOME = 'Home',
+  /**
+   * 宅配
+   */
+  HOME = 'Home',
 }

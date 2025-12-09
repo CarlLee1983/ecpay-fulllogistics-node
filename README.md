@@ -256,7 +256,7 @@ import {
   CreateLogisticsOrder,
   LogisticsSubType,
   IsCollection,
-  LogisticsException
+  LogisticsException,
 } from '@carllee1983/ecpay-fulllogistics'
 
 const config: EcPayConfig = {
@@ -268,21 +268,22 @@ const config: EcPayConfig = {
 
 try {
   const create = new CreateLogisticsOrder(config)
-  
-  create.setMerchantTradeNo('LOG123456789')
-        .setMerchantTradeDate(new Date())
-        .setLogisticsSubType(LogisticsSubType.UNIMART)
-        .setGoodsAmount(100)
-        .setGoodsName('Test Goods')
-        .setSenderName('Sender')
-        .setSenderCellPhone('0912345678')
-        .setReceiverName('Receiver')
-        .setReceiverCellPhone('0987654321')
-        .setReceiverStoreID('123456') // Store ID for UNIMART
-        .setServerReplyURL('https://example.com/reply')
-        
+
+  create
+    .setMerchantTradeNo('LOG123456789')
+    .setMerchantTradeDate(new Date())
+    .setLogisticsSubType(LogisticsSubType.UNIMART)
+    .setGoodsAmount(100)
+    .setGoodsName('Test Goods')
+    .setSenderName('Sender')
+    .setSenderCellPhone('0912345678')
+    .setReceiverName('Receiver')
+    .setReceiverCellPhone('0987654321')
+    .setReceiverStoreID('123456') // Store ID for UNIMART
+    .setServerReplyURL('https://example.com/reply')
+
   const response = await create.send()
-  
+
   if (response.isSuccess()) {
     console.log('Logistics ID:', response.getAllPayLogisticsID())
   } else {
@@ -290,9 +291,9 @@ try {
   }
 } catch (error) {
   if (error instanceof LogisticsException) {
-     console.error('Validation Error:', error.message)
+    console.error('Validation Error:', error.message)
   } else {
-     console.error(error)
+    console.error(error)
   }
 }
 ```
@@ -304,7 +305,7 @@ import {
   EcPayConfig,
   ApiMode,
   OpenLogisticsSelection,
-  LogisticsSubType
+  LogisticsSubType,
 } from '@carllee1983/ecpay-fulllogistics'
 
 const config: EcPayConfig = {
@@ -315,25 +316,22 @@ const config: EcPayConfig = {
 }
 
 const selection = new OpenLogisticsSelection(config)
-selection.setLogisticsSubType(LogisticsSubType.UNIMART)
-         .setServerReplyURL('https://example.com/reply') // ECPay will post data here
-         .setClientReplyURL('https://example.com/return') // Redirect user here after selection
+selection
+  .setLogisticsSubType(LogisticsSubType.UNIMART)
+  .setServerReplyURL('https://example.com/reply') // ECPay will post data here
+  .setClientReplyURL('https://example.com/return') // Redirect user here after selection
 
 // Generate HTML form to submit to ECPay
 const htmlForm = selection.generateForm()
 
 // Return this HTML to the browser
-// res.send(htmlForm) 
+// res.send(htmlForm)
 ```
 
 ### 8. Query Logistics Order
 
 ```typescript
-import {
-  EcPayConfig,
-  ApiMode,
-  QueryLogisticsOrder
-} from '@carllee1983/ecpay-fulllogistics'
+import { EcPayConfig, ApiMode, QueryLogisticsOrder } from '@carllee1983/ecpay-fulllogistics'
 
 const query = new QueryLogisticsOrder(config)
 query.setAllPayLogisticsID('12345678')
@@ -389,14 +387,15 @@ import {
   UpdateTempTrade,
   CancelC2COrder,
   ReturnCVS,
-  LogisticsSubType
+  LogisticsSubType,
 } from '@carllee1983/ecpay-fulllogistics'
 
 // Example: Cancel C2C Order
 const cancel = new CancelC2COrder(config)
-cancel.setAllPayLogisticsID('12345678')
-      .setLogisticsSubType(LogisticsSubType.UNIMART_C2C)
-      .setCVSValidationNo('1111')
+cancel
+  .setAllPayLogisticsID('12345678')
+  .setLogisticsSubType(LogisticsSubType.UNIMART_C2C)
+  .setCVSValidationNo('1111')
 const res = await cancel.send()
 ```
 

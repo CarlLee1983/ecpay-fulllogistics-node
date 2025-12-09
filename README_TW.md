@@ -256,7 +256,7 @@ import {
   CreateLogisticsOrder,
   LogisticsSubType,
   IsCollection,
-  LogisticsException
+  LogisticsException,
 } from '@carllee1983/ecpay-fulllogistics'
 
 const config: EcPayConfig = {
@@ -268,21 +268,22 @@ const config: EcPayConfig = {
 
 try {
   const create = new CreateLogisticsOrder(config)
-  
-  create.setMerchantTradeNo('LOG123456789')
-        .setMerchantTradeDate(new Date())
-        .setLogisticsSubType(LogisticsSubType.UNIMART)
-        .setGoodsAmount(100)
-        .setGoodsName('測試商品')
-        .setSenderName('寄件人')
-        .setSenderCellPhone('0912345678')
-        .setReceiverName('收件人')
-        .setReceiverCellPhone('0987654321')
-        .setReceiverStoreID('123456') // UNIMART 門市代號
-        .setServerReplyURL('https://example.com/reply')
-        
+
+  create
+    .setMerchantTradeNo('LOG123456789')
+    .setMerchantTradeDate(new Date())
+    .setLogisticsSubType(LogisticsSubType.UNIMART)
+    .setGoodsAmount(100)
+    .setGoodsName('測試商品')
+    .setSenderName('寄件人')
+    .setSenderCellPhone('0912345678')
+    .setReceiverName('收件人')
+    .setReceiverCellPhone('0987654321')
+    .setReceiverStoreID('123456') // UNIMART 門市代號
+    .setServerReplyURL('https://example.com/reply')
+
   const response = await create.send()
-  
+
   if (response.isSuccess()) {
     console.log('物流交易編號:', response.getAllPayLogisticsID())
   } else {
@@ -290,9 +291,9 @@ try {
   }
 } catch (error) {
   if (error instanceof LogisticsException) {
-     console.error('驗證錯誤:', error.message)
+    console.error('驗證錯誤:', error.message)
   } else {
-     console.error(error)
+    console.error(error)
   }
 }
 ```
@@ -304,7 +305,7 @@ import {
   EcPayConfig,
   ApiMode,
   OpenLogisticsSelection,
-  LogisticsSubType
+  LogisticsSubType,
 } from '@carllee1983/ecpay-fulllogistics'
 
 const config: EcPayConfig = {
@@ -315,25 +316,22 @@ const config: EcPayConfig = {
 }
 
 const selection = new OpenLogisticsSelection(config)
-selection.setLogisticsSubType(LogisticsSubType.UNIMART)
-         .setServerReplyURL('https://example.com/reply') // 綠界會將資料 POST 到此網址
-         .setClientReplyURL('https://example.com/return') // 選擇完成後將用戶導引回此網址
+selection
+  .setLogisticsSubType(LogisticsSubType.UNIMART)
+  .setServerReplyURL('https://example.com/reply') // 綠界會將資料 POST 到此網址
+  .setClientReplyURL('https://example.com/return') // 選擇完成後將用戶導引回此網址
 
 // 產生 HTML 表單以提交給綠界
 const htmlForm = selection.generateForm()
 
 // 將此 HTML 回傳給瀏覽器
-// res.send(htmlForm) 
+// res.send(htmlForm)
 ```
 
 ### 8. 查詢物流訂單 (Query Logistics Order)
 
 ```typescript
-import {
-  EcPayConfig,
-  ApiMode,
-  QueryLogisticsOrder
-} from '@carllee1983/ecpay-fulllogistics'
+import { EcPayConfig, ApiMode, QueryLogisticsOrder } from '@carllee1983/ecpay-fulllogistics'
 
 const query = new QueryLogisticsOrder(config)
 query.setAllPayLogisticsID('12345678')
@@ -389,14 +387,15 @@ import {
   UpdateTempTrade,
   CancelC2COrder,
   ReturnCVS,
-  LogisticsSubType
+  LogisticsSubType,
 } from '@carllee1983/ecpay-fulllogistics'
 
 // 範例：取消 C2C 訂單
 const cancel = new CancelC2COrder(config)
-cancel.setAllPayLogisticsID('12345678')
-      .setLogisticsSubType(LogisticsSubType.UNIMART_C2C)
-      .setCVSValidationNo('1111')
+cancel
+  .setAllPayLogisticsID('12345678')
+  .setLogisticsSubType(LogisticsSubType.UNIMART_C2C)
+  .setCVSValidationNo('1111')
 const res = await cancel.send()
 ```
 
