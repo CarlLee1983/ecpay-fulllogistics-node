@@ -58,7 +58,7 @@ async function build() {
   console.log('📝 Generating type declarations...')
   // Only generate declarations for src files, not test or build.ts
   const tscResult =
-    await $`bunx tsc --emitDeclarationOnly --outDir ./dist/types --declaration --declarationMap --rootDir ./src src/**/*.ts`.nothrow()
+    await $`bunx tsc --emitDeclarationOnly --outDir ./dist/types --declaration --declarationMap -p tsconfig.build.json`.nothrow()
 
   if (tscResult.exitCode !== 0) {
     console.error('❌ Type declaration generation failed')

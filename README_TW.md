@@ -247,92 +247,157 @@ try {
 }
 ```
 
-### 6. 完整 API 呼叫範例
+### 6. 建立物流訂單 (Create Logistics Order)
 
 ```typescript
 import {
+  EcPayConfig,
   ApiMode,
-  getApiUrl,
-  PayloadEncoder,
-  Response,
-  LogisticsException,
-  type EcPayConfig,
+  CreateLogisticsOrder,
+  LogisticsSubType,
+  IsCollection,
+  LogisticsException
 } from '@carllee1983/ecpay-fulllogistics'
 
-async function createLogisticsOrder(orderData: {
-  merchantTradeNo: string
-  goodsAmount: number
-  goodsName: string
-  receiverName: string
-  receiverPhone: string
-  receiverStoreId: string
-}) {
-  // 設定
-  const config: EcPayConfig = {
-    merchantId: '2000132',
-    hashKey: '5294y06JbISpM5x9',
-    hashIv: 'v77hoKGq4kWxNNIS',
-    mode: ApiMode.Staging,
-  }
-
-  const encoder = new PayloadEncoder(config.hashKey, config.hashIv)
-
-  // 建立請求資料
-  const payload = encoder.encode(config.merchantId, {
-    MerchantTradeNo: orderData.merchantTradeNo,
-    LogisticsType: 'CVS',
-    LogisticsSubType: 'UNIMART',
-    GoodsAmount: orderData.goodsAmount,
-    GoodsName: orderData.goodsName,
-    SenderName: '商店名稱',
-    SenderCellPhone: '0912345678',
-    ReceiverName: orderData.receiverName,
-    ReceiverCellPhone: orderData.receiverPhone,
-    ReceiverStoreID: orderData.receiverStoreId,
-    ServerReplyURL: 'https://your-domain.com/logistics/callback',
-  })
-
-  try {
-    // 發送 API 請求
-    const apiUrl = getApiUrl(config.mode) + '/Express/v2/CreateOrder'
-    const result = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-
-    const apiResponse = await result.json()
-    const response = new Response(apiResponse, encoder)
-
-    if (response.isSuccess()) {
-      return {
-        success: true,
-        logisticsId: response.getAllPayLogisticsID(),
-        validationNo: response.getCVSValidationNo(),
-        data: response.getData(),
-      }
-    } else {
-      throw LogisticsException.apiError(response.getRtnCode(), response.getRtnMsg())
-    }
-  } catch (error) {
-    if (error instanceof LogisticsException) {
-      throw error
-    }
-    throw LogisticsException.httpError(String(error))
-  }
+const config: EcPayConfig = {
+  merchantId: '2000132',
+  hashKey: '5294y06JbISpM5x9',
+  hashIv: 'v77hoKGq4kWxNNIS',
+  mode: ApiMode.Stage,
 }
 
-// 使用方式
-createLogisticsOrder({
-  merchantTradeNo: 'ORDER_' + Date.now(),
-  goodsAmount: 500,
-  goodsName: '測試商品',
-  receiverName: '王小明',
-  receiverPhone: '0987654321',
-  receiverStoreId: '991182',
-})
-  .then((result) => console.log('成功:', result))
-  .catch((error) => console.error('失敗:', error.message))
+try {
+  const create = new CreateLogisticsOrder(config)
+  
+  create.setMerchantTradeNo('LOG123456789')
+        .setMerchantTradeDate(new Date())
+        .setLogisticsSubType(LogisticsSubType.UNIMART)
+        .setGoodsAmount(100)
+        .setGoodsName('測試商品')
+        .setSenderName('寄件人')
+        .setSenderCellPhone('0912345678')
+        .setReceiverName('收件人')
+        .setReceiverCellPhone('0987654321')
+        .setReceiverStoreID('123456') // UNIMART 門市代號
+        .setServerReplyURL('https://example.com/reply')
+        
+  const response = await create.send()
+  
+  if (response.isSuccess()) {
+    console.log('物流交易編號:', response.getAllPayLogisticsID())
+  } else {
+    console.error('錯誤:', response.getRtnMsg())
+  }
+} catch (error) {
+  if (error instanceof LogisticsException) {
+     console.error('驗證錯誤:', error.message)
+  } else {
+     console.error(error)
+  }
+}
+```
+
+### 7. 開啟物流地圖選擇 (Open Logistics Selection)
+
+```typescript
+import {
+  EcPayConfig,
+  ApiMode,
+  OpenLogisticsSelection,
+  LogisticsSubType
+} from '@carllee1983/ecpay-fulllogistics'
+
+const config: EcPayConfig = {
+  merchantId: '2000132',
+  hashKey: '5294y06JbISpM5x9',
+  hashIv: 'v77hoKGq4kWxNNIS',
+  mode: ApiMode.Stage,
+}
+
+const selection = new OpenLogisticsSelection(config)
+selection.setLogisticsSubType(LogisticsSubType.UNIMART)
+         .setServerReplyURL('https://example.com/reply') // 綠界會將資料 POST 到此網址
+         .setClientReplyURL('https://example.com/return') // 選擇完成後將用戶導引回此網址
+
+// 產生 HTML 表單以提交給綠界
+const htmlForm = selection.generateForm()
+
+// 將此 HTML 回傳給瀏覽器
+// res.send(htmlForm) 
+```
+
+### 8. 查詢物流訂單 (Query Logistics Order)
+
+```typescript
+import {
+  EcPayConfig,
+  ApiMode,
+  QueryLogisticsOrder
+} from '@carllee1983/ecpay-fulllogistics'
+
+const query = new QueryLogisticsOrder(config)
+query.setAllPayLogisticsID('12345678')
+
+const response = await query.send()
+console.log('物流狀態:', response.getLogisticsStatus())
+```
+
+### 9. 列印託運單 (Print Trade Document)
+
+```typescript
+import { PrintTradeDocument } from '@carllee1983/ecpay-fulllogistics'
+
+const print = new PrintTradeDocument(config)
+print.setAllPayLogisticsID('12345678')
+
+// 產生 HTML 表單以提交給綠界
+const htmlForm = print.generateForm()
+```
+
+### 10. 物流狀態通知處理 (Logistics Notification Handling)
+
+```typescript
+import { LogisticsNotify } from '@carllee1983/ecpay-fulllogistics'
+
+// 在您的 Controller 中 (例如 Express.js)
+const notify = new LogisticsNotify('HashKey', 'HashIV')
+notify.handle(req.body)
+
+if (notify.isSuccess()) {
+  console.log('物流編號:', notify.getAllPayLogisticsID())
+  console.log('狀態:', notify.getLogisticsStatusName())
+  // 回傳 "1|OK" 告知綠界已收到
+  res.send(notify.getSuccessResponse())
+} else {
+  // 回傳錯誤
+  res.send(notify.getFailResponse('CheckSum Failed'))
+}
+```
+
+### 11. 其他操作 (Mutations & Reverse)
+
+SDK 支援完整的物流操作：
+
+- `UpdateTempTrade`: 更新暫存物流訂單 (出貨前)
+- `CancelC2COrder`: 取消 C2C 訂單
+- `UpdateB2COrder`: 更新 B2C 出貨資訊
+- `ReturnHome`: 建立宅配逆物流 (退貨)
+- `ReturnCVS`: 建立超商逆物流 (退貨)
+
+```typescript
+import {
+  UpdateTempTrade,
+  CancelC2COrder,
+  ReturnCVS,
+  LogisticsSubType
+} from '@carllee1983/ecpay-fulllogistics'
+
+// 範例：取消 C2C 訂單
+const cancel = new CancelC2COrder(config)
+cancel.setAllPayLogisticsID('12345678')
+      .setLogisticsSubType(LogisticsSubType.UNIMART_C2C)
+      .setCVSValidationNo('1111')
+const res = await cancel.send()
 ```
 
 ## 📖 API 參考

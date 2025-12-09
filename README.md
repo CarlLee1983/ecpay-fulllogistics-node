@@ -247,92 +247,157 @@ try {
 }
 ```
 
-### 6. Complete API Call Example
+### 6. Create Logistics Order
 
 ```typescript
 import {
+  EcPayConfig,
   ApiMode,
-  getApiUrl,
-  PayloadEncoder,
-  Response,
-  LogisticsException,
-  type EcPayConfig,
+  CreateLogisticsOrder,
+  LogisticsSubType,
+  IsCollection,
+  LogisticsException
 } from '@carllee1983/ecpay-fulllogistics'
 
-async function createLogisticsOrder(orderData: {
-  merchantTradeNo: string
-  goodsAmount: number
-  goodsName: string
-  receiverName: string
-  receiverPhone: string
-  receiverStoreId: string
-}) {
-  // Configuration
-  const config: EcPayConfig = {
-    merchantId: '2000132',
-    hashKey: '5294y06JbISpM5x9',
-    hashIv: 'v77hoKGq4kWxNNIS',
-    mode: ApiMode.Staging,
-  }
-
-  const encoder = new PayloadEncoder(config.hashKey, config.hashIv)
-
-  // Build request payload
-  const payload = encoder.encode(config.merchantId, {
-    MerchantTradeNo: orderData.merchantTradeNo,
-    LogisticsType: 'CVS',
-    LogisticsSubType: 'UNIMART',
-    GoodsAmount: orderData.goodsAmount,
-    GoodsName: orderData.goodsName,
-    SenderName: 'Shop Name',
-    SenderCellPhone: '0912345678',
-    ReceiverName: orderData.receiverName,
-    ReceiverCellPhone: orderData.receiverPhone,
-    ReceiverStoreID: orderData.receiverStoreId,
-    ServerReplyURL: 'https://your-domain.com/logistics/callback',
-  })
-
-  try {
-    // Send API request
-    const apiUrl = getApiUrl(config.mode) + '/Express/v2/CreateOrder'
-    const result = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-
-    const apiResponse = await result.json()
-    const response = new Response(apiResponse, encoder)
-
-    if (response.isSuccess()) {
-      return {
-        success: true,
-        logisticsId: response.getAllPayLogisticsID(),
-        validationNo: response.getCVSValidationNo(),
-        data: response.getData(),
-      }
-    } else {
-      throw LogisticsException.apiError(response.getRtnCode(), response.getRtnMsg())
-    }
-  } catch (error) {
-    if (error instanceof LogisticsException) {
-      throw error
-    }
-    throw LogisticsException.httpError(String(error))
-  }
+const config: EcPayConfig = {
+  merchantId: '2000132',
+  hashKey: '5294y06JbISpM5x9',
+  hashIv: 'v77hoKGq4kWxNNIS',
+  mode: ApiMode.Staging,
 }
 
-// Usage
-createLogisticsOrder({
-  merchantTradeNo: 'ORDER_' + Date.now(),
-  goodsAmount: 500,
-  goodsName: 'Test Product',
-  receiverName: 'John Doe',
-  receiverPhone: '0987654321',
-  receiverStoreId: '991182',
-})
-  .then((result) => console.log('Success:', result))
-  .catch((error) => console.error('Failed:', error.message))
+try {
+  const create = new CreateLogisticsOrder(config)
+  
+  create.setMerchantTradeNo('LOG123456789')
+        .setMerchantTradeDate(new Date())
+        .setLogisticsSubType(LogisticsSubType.UNIMART)
+        .setGoodsAmount(100)
+        .setGoodsName('Test Goods')
+        .setSenderName('Sender')
+        .setSenderCellPhone('0912345678')
+        .setReceiverName('Receiver')
+        .setReceiverCellPhone('0987654321')
+        .setReceiverStoreID('123456') // Store ID for UNIMART
+        .setServerReplyURL('https://example.com/reply')
+        
+  const response = await create.send()
+  
+  if (response.isSuccess()) {
+    console.log('Logistics ID:', response.getAllPayLogisticsID())
+  } else {
+    console.error('Error:', response.getRtnMsg())
+  }
+} catch (error) {
+  if (error instanceof LogisticsException) {
+     console.error('Validation Error:', error.message)
+  } else {
+     console.error(error)
+  }
+}
+```
+
+### 7. Open Logistics Selection
+
+```typescript
+import {
+  EcPayConfig,
+  ApiMode,
+  OpenLogisticsSelection,
+  LogisticsSubType
+} from '@carllee1983/ecpay-fulllogistics'
+
+const config: EcPayConfig = {
+  merchantId: '2000132',
+  hashKey: '5294y06JbISpM5x9',
+  hashIv: 'v77hoKGq4kWxNNIS',
+  mode: ApiMode.Staging,
+}
+
+const selection = new OpenLogisticsSelection(config)
+selection.setLogisticsSubType(LogisticsSubType.UNIMART)
+         .setServerReplyURL('https://example.com/reply') // ECPay will post data here
+         .setClientReplyURL('https://example.com/return') // Redirect user here after selection
+
+// Generate HTML form to submit to ECPay
+const htmlForm = selection.generateForm()
+
+// Return this HTML to the browser
+// res.send(htmlForm) 
+```
+
+### 8. Query Logistics Order
+
+```typescript
+import {
+  EcPayConfig,
+  ApiMode,
+  QueryLogisticsOrder
+} from '@carllee1983/ecpay-fulllogistics'
+
+const query = new QueryLogisticsOrder(config)
+query.setAllPayLogisticsID('12345678')
+
+const response = await query.send()
+console.log('Status:', response.getLogisticsStatus())
+```
+
+### 9. Print Trade Document
+
+```typescript
+import { PrintTradeDocument } from '@carllee1983/ecpay-fulllogistics'
+
+const print = new PrintTradeDocument(config)
+print.setAllPayLogisticsID('12345678')
+
+// Generate HTML form to submit to ECPay
+const htmlForm = print.generateForm()
+```
+
+### 10. Logistics Notification Handling
+
+```typescript
+import { LogisticsNotify } from '@carllee1983/ecpay-fulllogistics'
+
+// In your controller (e.g., Express.js)
+const notify = new LogisticsNotify('HashKey', 'HashIV')
+notify.handle(req.body)
+
+if (notify.isSuccess()) {
+  console.log('Logistics ID:', notify.getAllPayLogisticsID())
+  console.log('Status:', notify.getLogisticsStatusName())
+  // Return "1|OK" to ECPay
+  res.send(notify.getSuccessResponse())
+} else {
+  // Return error
+  res.send(notify.getFailResponse('CheckSum Failed'))
+}
+```
+
+### 11. Other Operations (Mutations & Reverse)
+
+The SDK supports various other operations:
+
+- `UpdateTempTrade`: Update temporary order (before shipping)
+- `CancelC2COrder`: Cancel C2C order
+- `UpdateB2COrder`: Update B2C shipment info
+- `ReturnHome`: Create Home Return order
+- `ReturnCVS`: Create CVS Return order
+
+```typescript
+import {
+  UpdateTempTrade,
+  CancelC2COrder,
+  ReturnCVS,
+  LogisticsSubType
+} from '@carllee1983/ecpay-fulllogistics'
+
+// Example: Cancel C2C Order
+const cancel = new CancelC2COrder(config)
+cancel.setAllPayLogisticsID('12345678')
+      .setLogisticsSubType(LogisticsSubType.UNIMART_C2C)
+      .setCVSValidationNo('1111')
+const res = await cancel.send()
 ```
 
 ## 📖 API Reference

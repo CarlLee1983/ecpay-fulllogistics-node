@@ -4,7 +4,9 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     // Output
     "outDir": "./dist",
     "declaration": true,
@@ -24,8 +26,18 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     // Bun Types
-    "types": ["bun-types"]
+    "types": [
+      "bun-types"
+    ]
   },
-  "include": ["src/**/*", "test/**/*", "build.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "build.ts",
+    "package.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

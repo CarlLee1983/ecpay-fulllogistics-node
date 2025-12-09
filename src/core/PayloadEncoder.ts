@@ -32,7 +32,7 @@ export class PayloadEncoder {
    * @param data Request data object
    * @returns Encrypted payload ready for API
    */
-  encode(merchantId: string, data: Record<string, unknown>): EncryptedPayload {
+  encode(merchantId: string, data: Record<string, unknown>, rqHeader?: RqHeader): EncryptedPayload {
     // 1. JSON Stringify the data
     const jsonString = JSON.stringify(data)
 
@@ -42,7 +42,7 @@ export class PayloadEncoder {
     // 3. Construct the full payload
     return {
       MerchantID: merchantId,
-      RqHeader: {
+      RqHeader: rqHeader ?? {
         Timestamp: Math.floor(Date.now() / 1000),
         Revision: '1.0.0',
       },
