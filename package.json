@@ -47,7 +47,9 @@
     "typescript",
     "sdk",
     "綠界",
-    "大物流"
+    "物流",
+    "全方位物流",
+    "綠界全方位物流"
   ],
   "scripts": {
     "build": "bun run build.ts",
